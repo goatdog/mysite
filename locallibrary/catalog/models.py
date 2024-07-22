@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from .constants import LOAN_STATUS
+from .constants import LoanStatus
 import uuid
 
 
@@ -43,9 +43,9 @@ class BookInstance(models.Model):
     due_back = models.DateField(null=True, blank=True)
     status = models.CharField(
         max_length=1,
-        choices=LOAN_STATUS,
+        choices=LoanStatus.options(),
         blank=True,
-        default='m',
+        default=LoanStatus.MAINTENANCE,
         help_text=_('Book Availability')
     )
 
