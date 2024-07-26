@@ -1,7 +1,9 @@
+from django.db.models.query import QuerySet
 from catalog.models import Book, Author, BookInstance, Genre
 from django.shortcuts import render
 from django.views import generic
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from typing import Any
 
 # Create your views here.
@@ -55,3 +57,24 @@ def book_detail_view(request, primary_key):
     book = get_object_or_404(Book, pk=primary_key)
 
     return render(request, 'catalog/book_detail.html', context={'book': book})
+
+
+# With function view: @login_required
+class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+    model = BookInstance
+    template_name = 'catalog/bookinstance_list_borrowed_user.html'
+    login_url = '/accounts/login/'
+    redirect_field_name = 'redirect_to'
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
+
+# With function view: @permission_required('catalog.can_mark_returned', raise_exception=True)
+class LibrarianLoanedBooksByUserListView(PermissionRequiredMixin, generic.ListView):
+    permission_required = ('catalog.can_mark_returned', )
+    model = BookInstance
+    template_name = 'catalog/bookinstance_list_borrowed_librarian.html'
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(status__exact='o').order_by('due_back')
+
