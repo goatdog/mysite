@@ -46,6 +46,7 @@ class BookListView(generic.ListView):
     model = Book
     # Get 5 books containing the title war: queryset = Book.objects.filter(title__icontains='war')[:5] 
     template_name = 'catalog/book_list.html' #Specify your own template name/location
+    paginate_by = 10
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context.
@@ -61,6 +62,7 @@ class BookDetailView(generic.DetailView):
 class AuthorListView(generic.ListView):
     model = Author
     template_name = 'catalog/author_list.html'
+    paginate_by = 10
 
 class AuthorDetailView(generic.DetailView):
     model = Author
@@ -77,8 +79,9 @@ def book_detail_view(request, primary_key):
 class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
     model = BookInstance
     template_name = 'catalog/bookinstance_list_borrowed_user.html'
-    login_url = '/accounts/login/'
+    login_url = '/en/accounts/login/'
     redirect_field_name = 'redirect_to'
+    paginate_by = 10
 
     def get_queryset(self):
         return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
@@ -87,7 +90,9 @@ class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
 class LibrarianLoanedBooksByUserListView(PermissionRequiredMixin, generic.ListView):
     permission_required = ('catalog.can_mark_returned', )
     model = BookInstance
+    login_url = '/en/accounts/login/'
     template_name = 'catalog/bookinstance_list_borrowed_librarian.html'
+    paginate_by = 10
 
     def get_queryset(self):
         return BookInstance.objects.filter(status__exact='o').order_by('due_back')
@@ -145,7 +150,7 @@ class AuthorDelete(DeleteView):
 # Model form for book:
 class BookCreate(CreateView):
     model = Book
-    fields = ['title', 'author', 'summary', 'isbn', 'genre']
+    fields = ['title', 'author', 'summary', 'isbn', 'genre', 'language']
     permission_required = 'catalog.add_book'
 
 class BookUpdate(UpdateView):

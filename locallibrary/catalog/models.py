@@ -18,6 +18,14 @@ class Genre(models.Model):
         """String for representing the Model object."""
         return self.name
     
+class Language(models.Model):
+    """Model representing a book genre."""
+    name = models.CharField(max_length=200, help_text=_('Enter a language (e.g.English)'))
+    
+    def __str__(self):
+        """String for representing the Model object."""
+        return self.name
+    
 class Book(models.Model):
     """Models representing a book."""
     title = models.CharField(max_length=200)
@@ -28,6 +36,8 @@ class Book(models.Model):
     isbn = models.CharField("ISBN", max_length=13, unique=True, help_text=_('13 Character <a href="https://www.isbn-international.org/content/what-isbn">ISBN number</a>'))
 
     genre = models.ManyToManyField(Genre, help_text=_("Select a genre for this book"))
+
+    language = models.ManyToManyField(Language, help_text=_("Select a genre for this book"))
 
     def __str__(self):
         """String for representing the Model object."""
@@ -88,7 +98,7 @@ class Author(models.Model):
         return f"{self.last_name}, {self.first_name}"
     
     def save(self, *args, **kwargs):
-        if self.date_of_death <= self.date_of_birth:
-            raise ValidationError("Date of death cannot be greater than date of birth")
+        if (self.date_of_death is not None) and (self.date_of_birth is not None) and self.date_of_death <= self.date_of_birth:
+            raise ValidationError("Date of birth cannot be greater or equal than date of death")
         super().save(*args, **kwargs)
     
