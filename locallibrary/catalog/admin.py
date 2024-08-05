@@ -15,9 +15,9 @@ class BooksInstanceInline(admin.TabularInline):
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'display_genre')
-    def display_genre(self):
+    def display_genre(self, obj):
         """Create a string for the Genre. This is required to display genre in Admin."""
-        return ', '.join(genre.name for genre in self.genre.all()[:3])
+        return ', '.join(genre.name for genre in obj.genre.all()[:3])
     
     display_genre.short_description = 'Genre'
     inlines = [BooksInstanceInline]
@@ -34,3 +34,6 @@ class BookInstanceAdmin(admin.ModelAdmin):
         })
     )
 
+@admin.register(Genre)
+class GenreAdmin(admin.ModelAdmin):
+    pass
